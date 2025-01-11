@@ -14,6 +14,10 @@ CORS(app, resources={r"/*": {"origins": "*"}})
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
+@app.route('/', methods=['GET'])
+def index():
+    return jsonify({'message': 'Welcome to the YouTube Transcript API. Please use POST requests to /api/transcript with a YouTube URL.'})
+
 def get_video_transcript(url):
     try:
         parsed_url = urlparse(url)
