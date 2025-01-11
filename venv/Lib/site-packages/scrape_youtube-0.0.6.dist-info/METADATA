@@ -1,0 +1,29 @@
+Metadata-Version: 2.1
+Name: scrape_youtube
+Version: 0.0.6
+Summary: A python package for scrapping videos, audios, tanscripts, and descriptions from youtube
+Home-page: https://github.com/gufran21/youtube_scrapper
+Author: gufran21
+Author-email: gufranamu2004@gmail.com
+License: MIT
+Project-URL: Bug Tracker, https://github.com/gufran21/youtube_scrapper/issues
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.7
+Requires-Dist: ensure==1.0.2
+Requires-Dist: pytube3==9.6.4
+Requires-Dist: youtube-transcript-api==0.6.2
+Requires-Dist: scrapetube==2.5.1
+Requires-Dist: bs4==0.0.2
+Requires-Dist: requests==2.32.3
+Requires-Dist: types-requests==2.31.0.7
+Provides-Extra: testing
+Requires-Dist: pytest>=7.1.3; extra == "testing"
+Requires-Dist: mypy>=0.971; extra == "testing"
+Requires-Dist: flake8>=5.0.4; extra == "testing"
+Requires-Dist: tox>=3.25.1; extra == "testing"
+Requires-Dist: black>=22.8.0; extra == "testing"
+
+# youtube scrapper
