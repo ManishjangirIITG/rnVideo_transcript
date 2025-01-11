@@ -67,15 +67,24 @@ def get_video_transcript(url):
         if not video_id:
             raise ValueError("Invalid YouTube URL")
 
+        logger.info(f"Fetching transcript for video ID: {video_id}")
+
         # Use ScraperAPI to fetch the video page
         scraperapi_url = f"http://api.scraperapi.com?api_key=e123ff2e8a841bb69cbffc091abb3e6b&url=https://www.youtube.com/watch?v={video_id}"
+        logger.info(f"ScraperAPI URL: {scraperapi_url}")
+
         response = requests.get(scraperapi_url)
+        logger.info(f"ScraperAPI response status code: {response.status_code}")
 
         if response.status_code != 200:
-            raise Exception("Failed to fetch video page")
+            logger.error(f"Failed to fetch video page: {response.status_code}")
+            raise Exception(f"Failed to fetch video page: {response.status_code}")
+
+        logger.info("Video page fetched successfully")
 
         # Extract transcript using youtube_transcript_api
         transcript = YouTubeTranscriptApi.get_transcript(video_id)
+        logger.info("Transcript fetched successfully")
 
         # Combine all text into a single paragraph
         transcript_text = " ".join([entry['text'] for entry in transcript])
