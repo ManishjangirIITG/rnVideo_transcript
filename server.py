@@ -6,6 +6,7 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 import logging
 import os
+import requests
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
@@ -57,6 +58,8 @@ def health():
 
 def get_video_transcript(url):
     try:
+        def get_video_transcript(url):
+    try:
         parsed_url = urlparse(url)
         if 'youtube.com' in parsed_url.netloc:
             query_params = parse_qs(parsed_url.query)
@@ -67,6 +70,13 @@ def get_video_transcript(url):
         if not video_id:
             raise ValueError("Invalid YouTube URL")
 
+        # Test network access to YouTube
+        test_url = f"https://www.youtube.com/watch?v={video_id}"
+        response = requests.get(test_url)
+        if response.status_code != 200:
+            logger.error(f"Network access to YouTube failed: {response.status_code}")
+            return None
+
         # Fetch transcript
         transcript = YouTubeTranscriptApi.get_transcript(video_id)
 
@@ -74,9 +84,21 @@ def get_video_transcript(url):
         transcript_text = " ".join([entry['text'] for entry in transcript])
         return transcript_text
 
+    except TranscriptsDisabled:
+        logger.error(f"Subtitles are disabled for the video: {url}")
+        return None
     except Exception as e:
         logger.error(f"Error fetching transcript: {str(e)}", exc_info=True)
         raise
+
+@app.route('/env',methods=['GET'])
+def env():
+    import sys
+    import pkg_resources
+    return jsonify({
+        'python_version': sys.version,
+        'installed_packages': {pkg.key: pkg.version for pkg in pkg_resources.working_set}
+    })
 
 @app.route('/api/transcript', methods=['POST'])
 @limiter.limit("100 per hour")
