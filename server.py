@@ -1,22 +1,19 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-from youtube_transcript_api import YouTubeTranscriptApi
+from youtube_transcript_api import YouTubeTranscriptApi, TranscriptsDisabled
 from urllib.parse import urlparse, parse_qs
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 import logging
 import os
 import requests
+import time
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
 
 # Configure logging
-logging.basicConfig(
-    level=logging.INFO if os.environ.get('ENVIRONMENT') == 'production' else logging.DEBUG,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[logging.StreamHandler()]
-)
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
 # Configure rate limiting
@@ -56,9 +53,9 @@ def health():
         'service': 'youtube-transcript-api'
     })
 
+import requests
+
 def get_video_transcript(url):
-    try:
-        def get_video_transcript(url):
     try:
         parsed_url = urlparse(url)
         if 'youtube.com' in parsed_url.netloc:
@@ -70,14 +67,14 @@ def get_video_transcript(url):
         if not video_id:
             raise ValueError("Invalid YouTube URL")
 
-        # Test network access to YouTube
-        test_url = f"https://www.youtube.com/watch?v={video_id}"
-        response = requests.get(test_url)
-        if response.status_code != 200:
-            logger.error(f"Network access to YouTube failed: {response.status_code}")
-            return None
+        # Use ScraperAPI to fetch the video page
+        scraperapi_url = f"http://api.scraperapi.com?api_key=e123ff2e8a841bb69cbffc091abb3e6b&url=https://www.youtube.com/watch?v={video_id}"
+        response = requests.get(scraperapi_url)
 
-        # Fetch transcript
+        if response.status_code != 200:
+            raise Exception("Failed to fetch video page")
+
+        # Extract transcript using youtube_transcript_api
         transcript = YouTubeTranscriptApi.get_transcript(video_id)
 
         # Combine all text into a single paragraph
@@ -90,6 +87,7 @@ def get_video_transcript(url):
     except Exception as e:
         logger.error(f"Error fetching transcript: {str(e)}", exc_info=True)
         raise
+
 
 @app.route('/env',methods=['GET'])
 def env():
